@@ -4,4 +4,4 @@ const EntryPage = ({params}) => {
     <h1>Entry {params.id}</h1>
   </div>
 }
-export default EntryPage
+export default EntryPag
