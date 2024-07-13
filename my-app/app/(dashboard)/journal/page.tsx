@@ -1,5 +1,6 @@
 import EntryCard from '@/components/EntryCard'
 import NewEntryCard from '@/components/NewEntryCard'
+import { analyse } from '@/utils/ai'
 import { getUserByClerkID } from '@/utils/auth'
 import { prisma } from '@/utils/db'
 import Link from 'next/link'
@@ -14,6 +15,8 @@ const getEntries = async () => {
       createdAt: 'desc',
     },
   })
+
+  await analyse('create me a vue component that displays a list of journal entries')
   return entries
 }
 
