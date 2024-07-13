@@ -16,7 +16,12 @@ const getEntries = async () => {
     },
   })
 
-  await analyse('create me a vue component that displays a list of journal entries')
+  await analyse(
+    `I am going to give you an journal entry,i want you to analyze for a few things. I need the mood, a summary , what the subject is , and a color representing the mood. You need to respond back with formatted JSON LIKE SO: {"mood":"","subject":"","color":"","negative":""}. 
+    entry:
+    Today was a good day. I went to the park and played with my dog. I had a lot of fun. I felt happy. I am grateful for my dog.
+    `
+  )
   return entries
 }
 
