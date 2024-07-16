@@ -11,10 +11,12 @@
   "dependencies": {
     "@clerk/nextjs": "^5.2.2",
     "@prisma/client": "^5.16.1",
+    "@types/axios": "^0.14.0",
     "@types/node": "20.14.10",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "autoprefixer": "10.4.19",
+    "axios": "^1.7.2",
     "eslint": "8.57.0",
     "eslint-config-next": "14.2.4",
     "langchain": "^0.2.9",
