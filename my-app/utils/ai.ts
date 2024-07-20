@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { StructuredOutputParser } from 'langchain/output_parsers'
 import z from 'zod'
+import { ChatPromptTemplate } from '@langchain/core/prompts'
 
 // Define the Zod schema for the output parser
 const parser = StructuredOutputParser.fromZodSchema(
@@ -28,14 +29,32 @@ const parser = StructuredOutputParser.fromZodSchema(
   })
 )
 
+const getPrompt = async (content: any) => {
+  const format_instructions = parser.getFormatInstructions()
+
+  const prompt = new ChatPromptTemplate({
+    template:
+      'Analyze the following journal entry. Follow the instructions and format your response to match the format instructions, no matter what! \n{format_instructions}\n{entry}',
+    inputVariables: ['entry'],
+    partialVariables: { format_instructions },
+  } as unknown as ChatPromptTemplate<any, any>)
+
+  const input = await prompt.format({
+    entry: content,
+  })
+
+  return input
+}
+
 // Function to analyze the prompt using Eden AI
-export const analyse = async (prompt: string) => {
+export const analyse = async (content: any) => {
+  const input = await getPrompt(content)
   const apiKey = process.env.EDEN_API_KEY
   const url = 'https://api.edenai.run/v1/pretrained/text/analysis'
 
   const data = {
     providers: ['openai'], // Specify the provider you want to use (e.g., 'openai')
-    text: prompt,
+    text: input,
   }
 
   const headers = {
