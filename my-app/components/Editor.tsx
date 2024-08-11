@@ -1,11 +1,22 @@
 'use client'
-import { updateEntry, deleteEntry } from '@/utils/api'
+import { updatedEntry, deleteEntry } from '@/utils/api'
 import { useState } from 'react'
 import { useAutosave } from 'react-autosave'
-// import Spinner from './Spinner'
+
+// If the above import path is incorrect, please update it to the correct path.
 import { useRouter } from 'next/navigation'
 
-const Editor = ({ entry }) => {
+type EntryType = {
+  id: string
+  content: string
+  analysis: {
+    color: string
+    subject: string
+    mood: string
+    negative: boolean
+  }
+}
+const Editor = ({ entry }: { entry: EntryType }) => {
   const [text, setText] = useState(entry.content)
   const [currentEntry, setEntry] = useState(entry)
   const [isSaving, setIsSaving] = useState(false)
@@ -15,6 +26,7 @@ const Editor = ({ entry }) => {
     await deleteEntry(entry.id)
     router.push('/journal')
   }
+
   useAutosave({
     data: text,
     onSave: async (_text) => {
@@ -45,40 +57,44 @@ const Editor = ({ entry }) => {
         />
       </div>
       <div className="border-l border-black/5">
-        <div
-          style={{ background: currentEntry.analysis.color }}
-          className="h-[100px] bg-blue-600 text-white p-8"
-        >
-          <h2 className="text-2xl bg-white/25 text-black">Analysis</h2>
-        </div>
-        <div>
-          <ul role="list" className="divide-y divide-gray-200">
-            <li className="py-4 px-8 flex items-center justify-between">
-              <div className="text-xl font-semibold w-1/3">Subject</div>
-              <div className="text-xl">{currentEntry.analysis.subject}</div>
-            </li>
+        {currentEntry.analysis && (
+          <>
+            <div
+              style={{ background: currentEntry.analysis.color }}
+              className="h-[100px] bg-blue-600 text-white p-8"
+            >
+              <h2 className="text-2xl bg-white/25 text-black">Analysis</h2>
+            </div>
+            <div>
+              <ul role="list" className="divide-y divide-gray-200">
+                <li className="py-4 px-8 flex items-center justify-between">
+                  <div className="text-xl font-semibold w-1/3">Subject</div>
+                  <div className="text-xl">{currentEntry.analysis.subject}</div>
+                </li>
 
-            <li className="py-4 px-8 flex items-center justify-between">
-              <div className="text-xl font-semibold">Mood</div>
-              <div className="text-xl">{currentEntry.analysis.mood}</div>
-            </li>
+                <li className="py-4 px-8 flex items-center justify-between">
+                  <div className="text-xl font-semibold">Mood</div>
+                  <div className="text-xl">{currentEntry.analysis.mood}</div>
+                </li>
 
-            <li className="py-4 px-8 flex items-center justify-between">
-              <div className="text-xl font-semibold">Negative</div>
-              <div className="text-xl">
-                {currentEntry.analysis.negative ? 'True' : 'False'}
-              </div>
-            </li>
-            <li className="py-4 px-8 flex items-center justify-between">
-              <button
-                onClick={handleDelete}
-                type="button"
-                className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-              >
-                Delete
-              </button>
-            </li>
-          </ul>
+                <li className="py-4 px-8 flex items-center justify-between">
+                  <div className="text-xl font-semibold">Negative</div>
+                  <div className="text-xl">
+                    {currentEntry.analysis.negative ? 'True' : 'False'}
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </>
+        )}
+        <div className="py-4 px-8">
+          <button
+            onClick={handleDelete}
+            type="button"
+            className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>

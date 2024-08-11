@@ -1,17 +1,32 @@
 import axios from 'axios'
+import { OpenAI } from 'openai'
 import { StructuredOutputParser } from 'langchain/output_parsers'
 import z from 'zod'
 import { PromptTemplate } from '@langchain/core/prompts'
 
 // Define the Zod schema for the output parser
 const parser = StructuredOutputParser.fromZodSchema(
-  z.object({
-    mood: z.string(),
-    subject: z.string(),
-    negative: z.boolean(),
-    summary: z.string(),
-    color: z.string(),
-    sentimentScore: z.number(),
+ z.object({
+    mood: z
+      .string()
+      .describe('the mood of the person who wrote the journal entry.'),
+    subject: z.string().describe('the subject of the journal entry.'),
+    negative: z
+      .boolean()
+      .describe(
+        'is the journal entry negative? (i.e. does it contain negative emotions?).'
+      ),
+    summary: z.string().describe('quick summary of the entire entry.'),
+    color: z
+      .string()
+      .describe(
+        'a hexidecimal color code that represents the mood of the entry. Example #0101fe for blue representing happiness.'
+      ),
+    sentimentScore: z
+      .number()
+      .describe(
+        'sentiment of the text and rated on a scale from -10 to 10, where -10 is extremely negative, 0 is neutral, and 10 is extremely positive.'
+      ),
   })
 )
 
@@ -29,37 +44,12 @@ const getPrompt = async (content: any) => {
 
 export const analyze = async (content: string) => {
   const input = await getPrompt(content)
-  try {
-    const response = await axios.post(
-      'https://api.edenai.run/v1/pretrained/text/generation',
-      {
-        providers: 'openai',
-        text: input,
-        temperature: 0,
-        max_tokens: 100,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.EDEN_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    const result = response.data
-    const analysis = await parser.parse(result)
-
-    // Set color based on mood
-    if (analysis.mood === 'happy') {
-      analysis.color = '#00FF00' // Green for happy
-    } else if (analysis.mood === 'sad') {
-      analysis.color = '#FF0000' // Red for sad
-    } else {
-      analysis.color = '#FFFFFF' // Default color
-    }
-
-    return analysis
-  } catch (error) {
-    console.error('Error analyzing content:', error)
+  const model: OpenAI = new OpenAI({temperature: 0 , modelName: 'gpt-3.5-turbo'} as ClientOptions)
+  const result = await model.call(input)
+   try {
+    return parser.parse(result)
+   } catch (e) {
+    console.error(e)
     return null
-  }
+   }
 }

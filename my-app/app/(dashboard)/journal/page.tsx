@@ -14,9 +14,10 @@ const getEntries = async () => {
     orderBy: {
       createdAt: 'desc',
     },
+    
   })
 
-  console.log(
+  console.  log(
     await analyze(
     `I had a great day today! I went to the park and played with my friends. I also had a picnic with my family.`
     )
